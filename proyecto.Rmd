@@ -1,0 +1,131 @@
+---
+title: "Machine Learning Course Project"
+author: "Elisa Peirano"
+date: "9 de mayo de 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache=TRUE)
+```
+
+## Summary
+In this report, the data set on Weight Lifting Exercise from http://groupware.les.inf.puc-rio.br/har is used in order to predict the manner in which the exercise was done based on accelerometers on the belt, forearm, arm, and dumbell of 6 participants.
+
+## Loading the data
+```{r, cache=TRUE}
+
+download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", destfile = "training.csv", method = "curl")
+training <- read.csv("training.csv")
+dim(training)
+
+download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", destfile = "testing.csv", method = "curl")
+testing <- read.csv("testing.csv")
+```
+## Pre processing the data
+In taking a look at the training data set, we can see many columns with most of the values NAs or simply empty. As those aren't good predictors, we proceed to deleting them.
+Also, the first 7 columns are just informative so we won't be using them either for the prediction.
+```{r}
+train <- training[, !(names(training) %in% names(training)[1:7])]
+train <- train[, colSums(is.na(train))==0]
+lista <- c()
+for (i in 1:ncol(train)){if(length(which(train[,i]==""))!=0){lista <- c(lista,names(train)[i])}}
+train <- train[, !(names(train) %in% lista)]
+```
+
+As seen before, the training data set has over 19600 registries, so in order to be able to work with the data and provide different sets for training a model, we will split the training in 4 groups of about the same length.
+```{r}
+library(caret)
+set.seed(1209)
+part1 <- createDataPartition(y = train$classe, p = .25, list=FALSE)
+ds1 <- train[part1,]
+rem <- train[-part1,]
+part2 <- createDataPartition(y=rem$classe, p=.33, list=FALSE)
+ds2 <- rem[part2,]
+rem <- rem[-part2,]
+part3 <- createDataPartition(y=rem$classe, p=0.5, list=FALSE)
+ds3 <- rem[part3,]
+ds4 <- rem[-part3,]
+```
+Then for each of the groups we subset a training and testing set with a proportion of 70-30 percent.
+```{r}
+set.seed(1209)
+inTrain <- createDataPartition(y=ds1$classe, p=.7, list=FALSE)
+train1 <- ds1[inTrain,]
+test1 <- ds1[-inTrain,]
+inTrain <- createDataPartition(y=ds2$classe, p=.7, list=FALSE)
+train2 <- ds2[inTrain,]
+test2 <- ds2[-inTrain,]
+inTrain <- createDataPartition(y=ds3$classe, p=.7, list=FALSE)
+train3 <- ds3[inTrain,]
+test3 <- ds3[-inTrain,]
+inTrain <- createDataPartition(y=ds4$classe, p=.7, list=FALSE)
+train4 <- ds4[inTrain,]
+test4 <- ds4[-inTrain,]
+```
+## Building the prediction model
+There are several ways and method to build a predicition model. In this case we will compare predictiong with trees ("rpart" method) and predictiong with random forests ("rf" method). These were chosen for the interaction between variables they use and because of ramdom forests being one of the top performing algorithms.
+
+Fitting a "rpart" model for the first data set.
+```{r}
+set.seed(1209)
+fit1 <- train(train1$classe ~ ., data = train1, method = "rpart")
+pred1 <- predict(fit1, test1)
+confusionMatrix(pred1, test1$classe)
+```
+As can be seen in the Confusion Matrix, the accuracy is very low: 0,4912 so there are many bad predictions.
+
+Fitting a "rf" model for the first data set
+```{r, cache=TRUE}
+set.seed(1209)
+fit2 <- train(train1$classe ~ ., data = train1, method = "rf")
+pred2 <- predict(fit2, test1)
+confusionMatrix(pred2, test1$classe)
+```
+In this case the accuracy is conseiderably better: 0.9721
+
+Let's find out if it can be improved by using preProcessing and cross validation
+
+```{r, cache=TRUE}
+set.seed(1209)
+fit22 <- train(train1$classe ~ ., data = train1, method = "rf", preProcess=c("center", "scale"), trControl = trainControl(method = "cv", number = 4))
+pred2 <- predict(fit2, test1)
+confusionMatrix(pred2, test1$classe)
+```
+
+The accuracy for the model with cross validation and pre-processing actually drops a tiny bit. So, let's just use the model without them for the rest of the data sets
+```{r, cache=TRUE}
+set.seed(1209)
+fitt2 <- train(train2$classe ~ ., data = train2, method = "rf")
+pred3 <- predict(fitt2, test2)
+confusionMatrix(pred3, test2$classe)
+fitte2 <- train(train3$classe ~ ., data = train3, method = "rf")
+pred4 <- predict(fitte2, test3)
+confusionMatrix(pred4, test3$classe)
+fitted2 <- train(train4$classe ~ ., data = train4, method = "rf")
+pred5 <- predict(fitted2, test4)
+confusionMatrix(pred5, test4$classe)
+```
+
+##Out of sample error
+The out of sample error for each model are the follwing:  
+*data set 1: 1-0.9721 = 0.0279  
+*data set 2: 1-0.9766 = 0.0234  
+*data set 3: 1-0.9655 = 0.0345  
+*data set 4: 1-0.9641 = 0.0359  
+
+The average out of sample error is: 
+```{r, echo=FALSE}
+mean(0.0279,0.0234,0.0345,0.0359)
+```
+
+Seeing as the best accuracy is from the second data set, we use that model to predict the testing data set:
+
+```{r}
+predict(fitt2, testing)
+```
+
+##Conclusion
+Considering a 97% accuracy as pretty good, it was only necessary to eliminate the variables from the data set that had too many NAs or no info at all.
+Even though the random forest method can be quite slow, the great performace makes up for it.
