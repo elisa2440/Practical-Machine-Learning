@@ -212,33 +212,33 @@ confusionMatrix(pred2, test1$classe)</code></pre>
 ## 
 ##           Reference
 ## Prediction   A   B   C   D   E
-##          A 414   7   0   1   0
-##          B   4 273   7   0   1
-##          C   0   4 242   4   0
-##          D   0   1   6 234   3
-##          E   0   0   1   2 266
+##          A 411  10   1   0   0
+##          B   2 269   3   0   0
+##          C   0   6 247   8   2
+##          D   5   0   5 233   2
+##          E   0   0   0   0 266
 ## 
 ## Overall Statistics
-##                                           
-##                Accuracy : 0.9721          
-##                  95% CI : (0.9624, 0.9799)
-##     No Information Rate : 0.2844          
-##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
-##                                           
-##                   Kappa : 0.9647          
-##  Mcnemar's Test P-Value : NA              
+##                                         
+##                Accuracy : 0.9701        
+##                  95% CI : (0.96, 0.9782)
+##     No Information Rate : 0.2844        
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16     
+##                                         
+##                   Kappa : 0.9621        
+##  Mcnemar's Test P-Value : NA            
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9904   0.9579   0.9453   0.9710   0.9852
-## Specificity            0.9924   0.9899   0.9934   0.9919   0.9975
-## Pos Pred Value         0.9810   0.9579   0.9680   0.9590   0.9888
-## Neg Pred Value         0.9962   0.9899   0.9885   0.9943   0.9967
+## Sensitivity            0.9833   0.9439   0.9648   0.9668   0.9852
+## Specificity            0.9895   0.9958   0.9868   0.9902   1.0000
+## Pos Pred Value         0.9739   0.9818   0.9392   0.9510   1.0000
+## Neg Pred Value         0.9933   0.9866   0.9925   0.9935   0.9967
 ## Prevalence             0.2844   0.1939   0.1741   0.1639   0.1837
-## Detection Rate         0.2816   0.1857   0.1646   0.1592   0.1810
-## Detection Prevalence   0.2871   0.1939   0.1701   0.1660   0.1830
-## Balanced Accuracy      0.9914   0.9739   0.9694   0.9814   0.9913</code></pre>
+## Detection Rate         0.2796   0.1830   0.1680   0.1585   0.1810
+## Detection Prevalence   0.2871   0.1864   0.1789   0.1667   0.1810
+## Balanced Accuracy      0.9864   0.9698   0.9758   0.9785   0.9926</code></pre>
 <p>In this case the accuracy is conseiderably better: 0.9721</p>
 <p>Let’s find out if it can be improved by using preProcessing and cross validation</p>
 <pre class="r"><code>set.seed(1209)
@@ -249,33 +249,33 @@ confusionMatrix(pred2, test1$classe)</code></pre>
 ## 
 ##           Reference
 ## Prediction   A   B   C   D   E
-##          A 411   4   1   1   0
-##          B   2 274   5   0   4
-##          C   0   6 248   7   0
-##          D   4   1   2 233   3
-##          E   1   0   0   0 263
+##          A 411  10   1   0   0
+##          B   2 269   3   0   0
+##          C   0   6 247   8   2
+##          D   5   0   5 233   2
+##          E   0   0   0   0 266
 ## 
 ## Overall Statistics
-##                                           
-##                Accuracy : 0.9721          
-##                  95% CI : (0.9624, 0.9799)
-##     No Information Rate : 0.2844          
-##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
-##                                           
-##                   Kappa : 0.9647          
-##  Mcnemar's Test P-Value : NA              
+##                                         
+##                Accuracy : 0.9701        
+##                  95% CI : (0.96, 0.9782)
+##     No Information Rate : 0.2844        
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16     
+##                                         
+##                   Kappa : 0.9621        
+##  Mcnemar's Test P-Value : NA            
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9833   0.9614   0.9688   0.9668   0.9741
-## Specificity            0.9943   0.9907   0.9893   0.9919   0.9992
-## Pos Pred Value         0.9856   0.9614   0.9502   0.9588   0.9962
-## Neg Pred Value         0.9934   0.9907   0.9934   0.9935   0.9942
+## Sensitivity            0.9833   0.9439   0.9648   0.9668   0.9852
+## Specificity            0.9895   0.9958   0.9868   0.9902   1.0000
+## Pos Pred Value         0.9739   0.9818   0.9392   0.9510   1.0000
+## Neg Pred Value         0.9933   0.9866   0.9925   0.9935   0.9967
 ## Prevalence             0.2844   0.1939   0.1741   0.1639   0.1837
-## Detection Rate         0.2796   0.1864   0.1687   0.1585   0.1789
-## Detection Prevalence   0.2837   0.1939   0.1776   0.1653   0.1796
-## Balanced Accuracy      0.9888   0.9761   0.9790   0.9793   0.9866</code></pre>
+## Detection Rate         0.2796   0.1830   0.1680   0.1585   0.1810
+## Detection Prevalence   0.2871   0.1864   0.1789   0.1667   0.1810
+## Balanced Accuracy      0.9864   0.9698   0.9758   0.9785   0.9926</code></pre>
 <p>The accuracy for the model with cross validation and pre-processing actually drops a tiny bit. So, let’s just use the model without them for the rest of the data sets</p>
 <pre class="r"><code>set.seed(1209)
 fitt2 &lt;- train(train2$classe ~ ., data = train2, method = &quot;rf&quot;)
